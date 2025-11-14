@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>For You ❤️</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fff0f6;
+    --pink:#ff4da6;
+    --soft:#ffd9ec;
+    --text:#3b1b2f;
+    --card: #ffffffcc;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,var(--bg),#fff7fb);}
+  .wrap{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px;
+    position:relative;
+    overflow:hidden;
+  }
+
+  /* Main card */
+  .card{
+    width:980px;
+    max-width:95%;
+    background:var(--card);
+    border-radius:18px;
+    box-shadow:0 10px 30px rgba(59,27,47,0.12);
+    padding:28px;
+    display:grid;
+    grid-template-columns: 1fr 380px;
+    gap:22px;
+    position:relative;
+  }
+
+  /* Left: gallery + letter */
+  .left{
+    padding:12px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .slideshow{
+    position:relative;
+    border-radius:12px;
+    overflow:hidden;
+    min-height:260px;
+    background:linear-gradient(135deg,#ffeaf2,#fff);
+    border:1px solid rgba(255,77,166,0.08);
+  }
+  .slides{
+    display:flex;
+    width:200%;
+    transition:transform .6s cubic-bezier(.2,.9,.3,1);
+  }
+  .slide{
+    width:50%;
+    padding:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .slide img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:10px;
+    box-shadow:0 8px 20px rgba(59,27,47,0.08);
+  }
+  .slideshow .controls{
+    position:absolute;
+    left:12px;right:12px;bottom:12px;display:flex;justify-content:space-between;pointer-events:none;
+  }
+  .btn{
+    pointer-events:all;
+    background:#fff;border:0;padding:8px 12px;border-radius:999px;font-weight:600;cursor:pointer;
+    box-shadow:0 4px 14px rgba(59,27,47,0.08);
+  }
+
+  /* letter */
+  .letter{
+    margin-top:8px;
+    background:linear-gradient(#fff,#fffaf6);
+    border-radius:12px;
+    padding:18px;
+    border:1px dashed rgba(255,77,166,0.18);
+    display:flex;flex-direction:column;gap:8px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+  .note{
+    font-family: 'Great Vibes', cursive;
+    font-size:24px;
+    color:var(--pink);
+    line-height:1.05;
+  }
+  .small{
+    color:#6a4354;font-size:14px;
+  }
+  .open-letter{
+    align-self:flex-start;margin-top:6px;background:transparent;border:2px solid var(--pink);color:var(--pink);padding:8px 14px;border-radius:999px;cursor:pointer;font-weight:700;
+  }
+
+  /* Right column */
+  .right{
+    padding:12px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .header{
+    display:flex;align-items:center;gap:12px;justify-content:space-between;
+  }
+  .title{
+    display:flex;flex-direction:column;
+  }
+  .title h1{margin:0;font-size:22px;color:var(--text);}
+  .title p{margin:0;font-size:13px;color:#8a6378}
+
+  .hearts{
+    display:flex;gap:8px;align-items:center;
+  }
+  .heart-btn{
+    background:transparent;border:2px solid rgba(255,77,166,0.12);padding:8px;border-radius:10px;cursor:pointer;font-weight:700;
+  }
+
+  .meta{
+    background:linear-gradient(180deg,#fff,#fff0f4);
+    padding:14px;border-radius:12px;border:1px solid rgba(255,77,166,0.06);
+  }
+  .kisses{
+    font-size:18px;color:var(--pink);font-weight:700;margin-top:6px;
+  }
+
+  /* write-back card */
+  .write{
+    margin-top:auto;
+    padding:14px;border-radius:12px;border:1px solid rgba(59,27,47,0.04);
+    background:#fff7fb;
+  }
+  .write textarea{width:100%;min-height:86px;border-radius:8px;padding:10px;border:1px solid rgba(59,27,47,0.06);resize:vertical}
+  .send{
+    margin-top:8px;display:flex;justify-content:space-between;align-items:center;
+  }
+
+  /* modal letter */
+  .modal{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(11,6,8,0.45);
+    z-index:1200;backdrop-filter: blur(3px);
+  }
+  .modal-card{
+    width:720px;max-width:94%;background:linear-gradient(#fff,#fff5f9);padding:28px;border-radius:14px;box-shadow:0 30px 80px rgba(59,27,47,0.3);
+    transform:translateY(0);
+  }
+  .modal-card .handwritten{
+    font-family:'Great Vibes',cursive;font-size:28px;color:#4a2030;
+    line-height:1.15;
+  }
+  .close{
+    margin-top:12px;background:var(--pink);color:#fff;border:0;padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:700;
+  }
+
+  /* petals */
+  .petal{
+    position:fixed;top:-10vh;left:50%;width:18px;height:18px;pointer-events:none;opacity:.95;z-index:900;
+    transform-origin:center;
+    background: radial-gradient(circle at 40% 30%, #fff6fc 0 30%, rgba(255,255,255,0) 60%), linear-gradient(180deg,#ffd6ec,#ffb6dd);
+    border-radius:60% 40% 50% 50% / 60% 40% 50% 50%;
+    filter: drop-shadow(0 6px 12px rgba(255,77,166,0.12));
+  }
+
+  /* confetti simple */
+  .confetti{
+    pointer-events:none;position:fixed;inset:0;z-index:1400;display:none;
+  }
+
+  /* responsive */
+  @media (max-width:900px){
+    .card{grid-template-columns:1fr; padding:16px;}
+    .right{order:2}
+    .left{order:1}
+  }
+</style>
+</head>
+<body>
+<div class="wrap" aria-live="polite">
+  <div class="card" role="main">
+    <div class="left">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="font-weight:800;font-size:20px;color:#5a2434">Pra você, Dona Rosa
+        </div>
+        <div style="background:linear-gradient(90deg,var(--pink),#ff7ab3);padding:6px 10px;border-radius:999px;color:white;font-weight:700"><3</div>
+      </div>
+
+      <!-- slideshow -->
+      <div class="slideshow" aria-label="Photos of us">
+        <div class="slides" id="slides">
+          <div class="slide">
+            <!-- replace with your first photo -->
+            <img src="https://i.imgur.com/5qHcoix.png" alt="Us together - 1" />
+          </div>
+          <div class="slide">
+            <!-- replace with your second photo -->
+            <img src="https://i.imgur.com/PVcEH7z.png" alt="My marceline" />
+          </div>
+        </div>
+        <div class="controls">
+          <button class="btn" id="prev">◀ Prev</button>
+          <div style="display:flex;gap:8px">
+            <button class="btn" id="like">💗 Like</button>
+            <button class="btn" id="next">Next ▶</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- letter preview -->
+      <div class="letter" aria-hidden="false">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="note">Eu te amo!!.</div>
+            <div class="small">Uma pequena carta digital para você, leia quando livre.</div>
+          </div>
+          <button class="open-letter" id="openLetter">Abrir</button>
+        </div>
+        <div style="margin-top:8px;color:#7a4f65;font-size:14px">
+          PS:Clique no coração para me ajudar a colecionar seus beijos. <span style="opacity:.9">🌸</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="header">
+        <div class="title">
+          <h1>Você é íncrivel</h1>
+          <p>Uma pequena Mensagem para você, feito com amor.</p>
+        </div>
+        <div class="hearts">
+          <button class="heart-btn" id="heartClick">💓Add beijos</button>
+          <div style="text-align:center">
+            <div style="font-size:12px;color:#8a6378">Kisses</div>
+            <div class="kisses" id="kisses">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="meta">
+        <div style="font-weight:700;color:#5a2434">Pequenas coisas que você consegue fazer</div>
+        <ul style="margin:8px 0 0 18px;color:#6b4a5f">
+          <li>Ver as fotos anterior e proximas</li>
+          <li>Abrir a carta para uma pequena surpresa</li>
+          <li>Me escrever de volta para confetes</li>
+        </ul>
+      </div>
+
+      <div class="write" aria-label="Write back">
+        <div style="font-weight:700;margin-bottom:6px;color:#5a2434">Me escreva de volta</div>
+        <textarea id="reply" placeholder="Type something sweet..."></textarea>
+        <div class="send">
+          <div>
+            <button class="btn" id="sendBtn">Enviar</button>
+            
+          </div>
+          <div style="font-size:12px;color:#8a6378">Infelizmente não posso ver sua mensagem, me fale o que escreveu depois, tá?!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal letter -->
+<div id="modal" class="modal" style="display:none" role="dialog" aria-modal="true" aria-label="Love letter">
+  <div class="modal-card">
+    <div class="handwritten" id="letterText">
+      Minha Rosa—<br><br>
+      Eu tenho tanto, e o sentimento por ela consome tudo. Eu tenho tanto, e sem ela se torna nada<br><br>
+      Com todo o meu coração,<br>
+      <span style="font-weight:800">André</span>
+    </div>
+    <button class="close" id="closeModal">Fechar</button>
+  </div>
+</div>
+
+<!-- petals container populated by JS -->
+<div id="petals"></div>
+
+<!-- confetti canvas -->
+<canvas id="confetti" class="confetti"></canvas>
+
+<!-- optional gentle audio (not autoplay) -->
+<audio id="bgm" src="" preload="none"></audio>
+
+<script>
+  // CONFIG: replace image filenames if needed and (optionally) set audio source
+  // document.getElementById('bgm').src = 'soft-music.mp3'; // uncomment & set if you want background music file
+  // --- slideshow
+  const slides = document.getElementById('slides');
+  let idx = 0;
+  function showIndex(i){
+    idx = i;
+    if(idx < 0) idx = 1;
+    if(idx > 1) idx = 0;
+    slides.style.transform = `translateX(${idx === 0 ? '0' : '-50%'})`;
+  }
+  document.getElementById('next').addEventListener('click', ()=> showIndex(idx+1));
+  document.getElementById('prev').addEventListener('click', ()=> showIndex(idx-1));
+
+  // hearts / kisses
+  const kissesEl = document.getElementById('kisses');
+  let kisses = 0;
+  function addKiss(){
+    kisses++;
+    kissesEl.textContent = kisses;
+    // small flying heart
+    const a = document.createElement('div');
+    a.textContent = '💘';
+    a.style.position='fixed';
+    a.style.left=(Math.random()*40+50)+'%';
+    a.style.top='55%';
+    a.style.zIndex=2000;
+    a.style.transform='translateY(0) scale(1)';
+    a.style.opacity=1;
+    a.style.transition='transform 900ms cubic-bezier(.2,.9,.3,1), opacity 900ms';
+    document.body.appendChild(a);
+    requestAnimationFrame(()=> {
+      a.style.transform='translateY(-160px) scale(1.6)';
+      a.style.opacity=0;
+    });
+    setTimeout(()=> a.remove(),950);
+  }
+  document.getElementById('heartClick').addEventListener('click', addKiss);
+  document.getElementById('like').addEventListener('click', addKiss);
+
+  // letter modal
+  const modal = document.getElementById('modal');
+  document.getElementById('openLetter').addEventListener('click', ()=> {
+    modal.style.display = 'flex';
+    // tiny flourish animation
+    modal.querySelector('.modal-card').animate([{transform:'translateY(20px)',opacity:0},{transform:'translateY(0)',opacity:1}],{duration:380,easing:'cubic-bezier(.2,.9,.3,1)'});
+  });
+  document.getElementById('closeModal').addEventListener('click', ()=> modal.style.display='none');
+
+  // write & confetti
+  const confettiCanvas = document.getElementById('confetti');
+  const ctx = confettiCanvas.getContext('2d');
+  let confettiActive = false;
+  function resizeCanvas(){
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  function startConfetti(){
+    confettiCanvas.style.display='block';
+    confettiActive = true;
+    const pieces = [];
+    const colors = ['#ff6fb1','#ffe1f1','#ffd6ec','#ffb6dd','#fca1c9'];
+    for(let i=0;i<80;i++){
+      pieces.push({
+        x: Math.random()*confettiCanvas.width,
+        y: -Math.random()*confettiCanvas.height,
+        w: 6 + Math.random()*10,
+        h: 6 + Math.random()*10,
+        vx: -1 + Math.random()*2,
+        vy: 2 + Math.random()*4,
+        r: Math.random()*360,
+        vr: (Math.random()-0.5)*8,
+        c: colors[Math.floor(Math.random()*colors.length)]
+      });
+    }
+    let t = 0;
+    function frame(){
+      if(!confettiActive) return;
+      ctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+      for(let p of pieces){
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.02;
+        p.r += p.vr;
+        ctx.save();
+        ctx.translate(p.x,p.y);
+        ctx.rotate(p.r * Math.PI/180);
+        ctx.fillStyle = p.c;
+        ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+        ctx.restore();
+      }
+      pieces.filter(p=> p.y < confettiCanvas.height + 50);
+      t++;
+      if(t < 220) requestAnimationFrame(frame);
+      else { confettiActive = false; confettiCanvas.style.display='none'; }
+    }
+    frame();
+  }
+
+  document.getElementById('sendBtn').addEventListener('click', ()=>{
+    const val = document.getElementById('reply').value.trim();
+    if(!val) {
+      alert("Escreva algo pra mim:(.");
+      return;
+    }
+    // show tiny popup
+    const b = document.createElement('div');
+    b.textContent = "Sent! 💌";
+    b.style.position='fixed';b.style.right='18px';b.style.bottom='18px';b.style.background='white';
+    b.style.padding='10px 14px';b.style.borderRadius='10px';b.style.boxShadow='0 8px 20px rgba(59,27,47,0.12)';
+    document.body.appendChild(b);
+    setTimeout(()=> b.remove(),1600);
+    // confetti
+    startConfetti();
+    document.getElementById('reply').value = '';
+  });
+
+  // music toggle (requires user to set src or browser will ignore)
+  const bgm = document.getElementById('bgm');
+  const toggle = document.getElementById('toggleMusic');
+  let playing = false;
+  toggle.addEventListener('click', ()=>{
+    if(!bgm.src){
+      alert('No music file set. If you want music, put an mp3 into the "bgm.src" line in the script.');
+      return;
+    }
+    if(!playing){ bgm.play(); toggle.textContent='Pause Music'; playing=true; }
+    else { bgm.pause(); toggle.textContent='Play Music'; playing=false; }
+  });
+
+  // create falling petals (CSS-based floating clones)
+  const petalsContainer = document.getElementById('petals');
+  function makePetal(delay, left, size, rotateSpeed, duration){
+    const el = document.createElement('div');
+    el.className = 'petal';
+    el.style.left = left + '%';
+    el.style.width = size + 'px';
+    el.style.height = (size*0.9) + 'px';
+    el.style.opacity = (0.7 + Math.random()*0.3);
+    el.style.transition = 'none';
+    document.body.appendChild(el);
+    // animate via JS because CSS keyframes with many particles is messy
+    const startX = (left/100) * window.innerWidth;
+    const drift = (Math.random()*200 - 100);
+    const rotateStart = Math.random()*360;
+    const start = performance.now() + (delay*1000);
+    function animate(now){
+      const t = (now - start) / (duration*1000);
+      if(t < 0){ requestAnimationFrame(animate); return; }
+      if(t > 1){ el.remove(); return; }
+      const y = t * (window.innerHeight + 200) - 100;
+      const x = startX + drift * Math.sin(t * Math.PI * 1.5);
+      el.style.transform = `translate(${x}px, ${y}px) rotate(${rotateStart + t*360*rotateSpeed}deg)`;
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+  }
+  // spawn petals periodically
+  setInterval(()=> {
+    const count = 2 + Math.floor(Math.random()*4);
+    for(let i=0;i<count;i++){
+      makePetal(Math.random()*2, Math.random()*100, 12 + Math.random()*22, 0.4 + Math.random()*1.4, 6 + Math.random()*6);
+    }
+  }, 1400);
+
+  // small accessibility: keyboard navigation for next/prev
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'ArrowRight') showIndex(idx+1);
+    if(e.key === 'ArrowLeft') showIndex(idx-1);
+    if(e.key === 'Escape') modal.style.display='none';
+  });
+
+  // initial small flourish
+  setTimeout(()=> {
+    document.querySelectorAll('.btn').forEach(b=> b.animate([{transform:'translateY(6px)',opacity:0},{transform:'translateY(0)',opacity:1}],{duration:420,easing:'cubic-bezier(.2,.9,.3,1)'}));
+  },320);
+
+  // replace instructions in-console (only to help you edit)
+  console.info('Replace "yourphoto1.jpg" and "yourphoto2.jpg" in the HTML with your images. Optionally set bgm.src in the script for music.');
+</script>
+</body>
+</html>
